@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ultimate Valentine ❤️</title>
+
 <style>
 body{
   font-family: Arial, sans-serif;
@@ -13,12 +14,13 @@ body{
   padding:30px;
   overflow:hidden;
 }
+
 .card{
   background: rgba(255,255,255,0.15);
   padding:25px;
   border-radius:20px;
-  position:relative;
 }
+
 button{
   padding:12px 20px;
   margin:10px;
@@ -28,19 +30,28 @@ button{
   font-weight:bold;
   cursor:pointer;
 }
+
 .gusto{background:white;color:#ff4d6d;}
 .ayoko{background:#ff4d6d;color:white;}
-img{width:230px;border-radius:15px;margin-top:15px;}
-.heart, .confetti{
+
+img{
+  width:230px;
+  border-radius:15px;
+  margin-top:15px;
+}
+
+.heart,.confetti{
   position:fixed;
   top:-10px;
   font-size:20px;
   animation:fall 5s linear infinite;
 }
+
 @keyframes fall{
   0%{transform:translateY(-10px);}
   100%{transform:translateY(100vh);}
 }
+
 #popup{
   display:none;
   position:fixed;
@@ -53,21 +64,18 @@ img{width:230px;border-radius:15px;margin-top:15px;}
   border-radius:15px;
   font-size:20px;
   box-shadow:0 0 20px rgba(0,0,0,0.5);
-  z-index:1000;
-}
-.credit{
-  font-size:12px; color:#fff; margin-top:10px;
 }
 </style>
 </head>
+
 <body>
 
 <audio id="music" loop>
-  <source src="https://www.bensound.com/bensound-music/bensound-cute.mp3" type="audio/mpeg">
+<source src="https://www.bensound.com/bensound-music/bensound-cute.mp3" type="audio/mpeg">
 </audio>
 
 <div class="card">
-<h1 id="title">Hi love! ❤️</h1>
+<h1>Hi love! ❤️</h1>
 <p id="question">Tap here po 😌</p>
 <img id="pic" src="">
 <br>
@@ -78,78 +86,61 @@ img{width:230px;border-radius:15px;margin-top:15px;}
 
 <script>
 let step=0;
-let noClicks=0;
-const maxNoClicks=3;
 
-// 10 sequential questions
-const questions=[
-"Pwede po ba kitang maging Valentine? 🥺❤️",
-"Sure ka po ba?😭😭 payag kana po love😭🐱",
-"Kahit milk tea date lang po 🧋🥺",
-"Kahit yakap lang po muna love 🫂",
-"Gusto mo po ice cream o chocolate? pwede rin pong ako jk🍦🎂",
-"Libre ko po fries, wag lang Ayoko 😭",
-"Gusto mo po sunset walk? 🌅",
-"Game po tayo ng taguan sa park? di pwedeng hinde 🏞️",
-"Mag-picture po tayo sa beach? 🏖️",
-"Gusto mo po manood ng movie with me? yung pirated po? jk 🎬"
+// Steps data with lightweight or local GIFs
+const stepsData=[
+  { text:"Pwede po ba kitang maging Valentine? 🥺❤️", pic:"https://media.giphy.com/media/3oriO0OEd9QIDdllqo/200w.gif"},
+  { text:"Sure ka po ba?😭😭 payag kana po love😭🐱", pic:"https://media3.giphy.com/media/TZBED1pP5m8N2/200w.gif"},
+  { text:"Kahit milk tea date lang po 🧋🥺", pic:"https://media2.giphy.com/media/klu2KSBQwdYA/200w.gif"},
+  { text:"Kahit yakap lang po muna love 🫂", pic:"https://media0.giphy.com/media/1JmGiBtqTuehfYxuy9/200w.gif"},
+  { text:"Gusto mo po ice cream o chocolate? pwede rin pong ako jk🍦🎂", pic:"https://media0.giphy.com/media/wrXXI5XwIx6c8/200w.gif"},
+  { text:"Libre ko po fries, wag lang Ayoko 😭", pic:"https://media2.giphy.com/media/mdmQ4KLq4Xm2i8Bopx/200w.gif"},
+  { text:"Gusto mo po sunset walk? 🌅", pic:"https://media4.giphy.com/media/N92tr5rzjZx7wnRKiy/200w.gif"},
+  { text:"Game po tayo ng taguan sa park? 🏞️", pic:"https://media4.giphy.com/media/901mxGLGQN2PyCQpoc/200w.gif"},
+  { text:"Mag-picture po tayo sa beach? 🏖️", pic:"https://media1.giphy.com/media/TjSPQgowhhJdHgvnwA/200w.gif"},
+  { text:"Gusto mo po manood ng movie with me? 🎬", pic:"https://media4.giphy.com/media/9uwnYUDw342pq/200w.gif"}
 ];
 
-// Direct GIF URLs (publicly hosted, reliable)
-const pics=[
-"https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif",
-"https://media3.giphy.com/media/TZBED1pP5m8N2/giphy.gif",
-"https://media2.giphy.com/media/klu2KSBQwdYA/giphy.gif",
-"https://media0.giphy.com/media/1JmGiBtqTuehfYxuy9/giphy.gif",
-"https://media0.giphy.com/media/wrXXI5XwIx6c8/giphy.gif",
-"https://media2.giphy.com/media/mdmQ4KLq4Xm2i8Bopx/giphy.gif",
-"https://media4.giphy.com/media/N92tr5rzjZx7wnRKiy/giphy.gif",
-"https://media4.giphy.com/media/901mxGLGQN2PyCQpoc/giphy.gif",
-"https://media1.giphy.com/media/TjSPQgowhhJdHgvnwA/giphy.gif",
-"https://media4.giphy.com/media/9uwnYUDw342pq/giphy.gif"
-];
+// PRELOAD all GIFs for instant switching
+stepsData.forEach(s=>{
+  const img=new Image();
+  img.src=s.pic;
+});
 
 function start(){
-  document.getElementById("music").play(); // start cute music
+  document.getElementById("music").play();
   makeHearts();
-  step = 0;
-  noClicks = 0;
+  step=0;
   showStep();
 }
 
-function gusto(){ showPopup(); }
-
-function ayoko(){
-  shake();
-  noClicks++;
-  step++;
-  if(step >= questions.length){
-    miniGame();
-  } else {
-    showStep();
-  }
-}
-
 function showStep(){
-  typeText(questions[step]);
-  document.getElementById("pic").src = pics[step];
-  addButtons(step < questions.length);
+  typeText(stepsData[step].text);
+  document.getElementById("pic").src=stepsData[step].pic;
+  addButtons();
 }
 
-function addButtons(showAyoko){
+function addButtons(){
   removeButtons();
-  let gustoBtn = document.createElement("button");
-  gustoBtn.innerHTML="Gusto ❤️";
-  gustoBtn.className="gusto";
-  gustoBtn.onclick=gusto;
-  document.querySelector(".card").appendChild(gustoBtn);
+  let g=document.createElement("button");
+  g.innerHTML="Gusto ❤️";
+  g.className="gusto";
+  g.onclick=showPopup;
+  document.querySelector(".card").appendChild(g);
 
-  if(showAyoko){
-    let ayokoBtn = document.createElement("button");
-    ayokoBtn.innerHTML="Ayoko 😭";
-    ayokoBtn.className="ayoko";
-    ayokoBtn.onclick=ayoko;
-    document.querySelector(".card").appendChild(ayokoBtn);
+  let a=document.createElement("button");
+  a.innerHTML="Ayoko 😭";
+  a.className="ayoko";
+  a.onclick=nextStep;
+  document.querySelector(".card").appendChild(a);
+}
+
+function nextStep(){
+  step++;
+  if(step>=stepsData.length){
+    miniGame();
+  }else{
+    showStep();
   }
 }
 
@@ -168,12 +159,6 @@ function makeHearts(){
   },500);
 }
 
-function shake(){
-  document.body.style.transform="translateX(10px)";
-  setTimeout(()=>document.body.style.transform="translateX(-10px)",100);
-  setTimeout(()=>document.body.style.transform="translateX(0px)",200);
-}
-
 function typeText(text){
   let q=document.getElementById("question");
   q.innerHTML="";
@@ -186,9 +171,10 @@ function typeText(text){
 }
 
 function miniGame(){
-  typeText(" tap 5 hearts po love para sa final answer hehehehe 💘");
+  typeText("Tap 5 hearts po love 💘");
   removeButtons();
   let count=0;
+
   let interval=setInterval(()=>{
     let h=document.createElement("div");
     h.innerHTML="💘";
@@ -197,17 +183,19 @@ function miniGame(){
     h.style.top=Math.random()*80+"%";
     h.style.fontSize="30px";
     h.style.cursor="pointer";
+
     h.onclick=()=>{
       h.remove();
       count++;
       if(count>=5){
         clearInterval(interval);
-        typeText("Final answer… magiging Valentine po ba kita? at magkikita po tayo? 😌❤️");
-        document.getElementById("pic").src=pics[0];
-        addButtons(false);
+        typeText("Final answer… magiging Valentine po ba kita? 😌❤️");
+        document.getElementById("pic").src=stepsData[0].pic;
+        addButtons();
         confetti();
       }
     };
+
     document.body.appendChild(h);
   },700);
 }
@@ -218,7 +206,6 @@ function confetti(){
     c.className="confetti";
     c.innerHTML="🎉";
     c.style.left=Math.random()*100+"%";
-    c.style.fontSize=(15+Math.random()*15)+"px";
     document.body.appendChild(c);
     setTimeout(()=>c.remove(),3000);
   }
